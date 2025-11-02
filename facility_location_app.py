@@ -1002,7 +1002,7 @@ def main():
                 st.success(f"✅ IP Solution found! Solve time: {problem_data['solve_time']:.3f} seconds")
                 
                 col1, col2 = st.columns([1, 2])
-            with col1:
+                with col1:
                     st.markdown("#### IP Solution Details:")
                     st.markdown(f"**Facilities**: {sorted(problem_data['solution'])}")
                     st.markdown(f"**Objective Value**: {problem_data['objective']:.2f}")
