@@ -1663,7 +1663,8 @@ def main():
             img_buffer = BytesIO()
             fig.savefig(img_buffer, format='png', dpi=300, bbox_inches='tight')
             img_buffer.seek(0)
-            plt.close(fig)
+            # Don't close the figure yet - close after adding to workbook
+            # plt.close(fig)
             
             # Create a worksheet for the visualization
             workbook = writer.book
@@ -1676,6 +1677,9 @@ def main():
             img.width = img.width * 0.6
             img.height = img.height * 0.6
             worksheet.add_image(img, 'A1')
+            
+            # Now close the figure
+            plt.close(fig)
         
         excel_data = output.getvalue()
         
@@ -1687,7 +1691,7 @@ def main():
             data=excel_data,
             file_name=filename,
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            use_container_width=True
+            width='stretch'
         )
         
         st.info("💡 **Excel file contains 6 sheets:**\n"
