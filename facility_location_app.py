@@ -1664,23 +1664,51 @@ def main():
                 'Y': list(demand_points[:, 1].round(2)) + list(facility_points[:, 1].round(2))
             })
             coordinates_df.to_excel(writer, sheet_name='All Coordinates', index=False)
+            
+            # Sheet 6: Visualization - Create and save plot
+            fig = create_base_data_visualization(
+                demand_points, demand_weights, facility_points, facility_costs, coverage_radius
+            )
+            
+            # Save plot to BytesIO buffer
+            img_buffer = BytesIO()
+            fig.savefig(img_buffer, format='png', dpi=300, bbox_inches='tight')
+            img_buffer.seek(0)
+            plt.close(fig)
+            
+            # Create a worksheet for the visualization
+            workbook = writer.book
+            worksheet = workbook.create_sheet('Visualization')
+            
+            # Insert image into worksheet
+            from openpyxl.drawing.image import Image
+            img = Image(img_buffer)
+            # Scale image to fit better in Excel (reduce size a bit)
+            img.width = img.width * 0.8
+            img.height = img.height * 0.8
+            worksheet.add_image(img, 'A1')
         
         excel_data = output.getvalue()
+        
+        # Create abbreviated filename with parameters
+        filename = f"FacLoc_D{len(demand_points)}_F{len(facility_points)}_R{coverage_radius:.1f}_P{num_facilities}_S{seed}.xlsx"
         
         st.download_button(
             label="📥 Download Excel File",
             data=excel_data,
-            file_name=f"facility_location_data_seed{seed}.xlsx",
+            file_name=filename,
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             use_container_width=True
         )
         
-        st.info("💡 **Excel file contains 5 sheets:**\n"
+        st.info("💡 **Excel file contains 6 sheets:**\n"
                 "1. **Parameters** - Problem configuration\n"
                 "2. **Distance Matrix** - Distances between all demand-facility pairs\n"
                 "3. **Demand Points** - Demand locations, coordinates, and weights\n"
                 "4. **Facility Points** - Facility locations, coordinates, and costs\n"
-                "5. **All Coordinates** - Combined coordinate data for easy plotting")
+                "5. **All Coordinates** - Combined coordinate data for easy plotting\n"
+                "6. **Visualization** - Plot showing demand points, facilities, and coverage\n\n"
+                f"📄 **Filename format:** `FacLoc_D[demands]_F[facilities]_R[radius]_P[p-facilities]_S[seed].xlsx`")
     
     elif st.session_state.show_about:
         # About this app content
