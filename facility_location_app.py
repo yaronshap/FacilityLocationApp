@@ -622,6 +622,17 @@ def main():
     
     # Sidebar for parameters
     st.sidebar.markdown('<h1 style="text-align: center; margin-bottom: 20px;">🏭 Facility Location Optimization</h1>', unsafe_allow_html=True)
+    
+    # About This App button (moved to top)
+    if st.sidebar.button("ℹ️ About This App", type="secondary", width='stretch'):
+        st.session_state.show_about = True
+        st.session_state.show_manual = False
+        st.session_state.show_comparison = False
+        st.session_state.current_problem = None
+        st.session_state.solve_error = None
+        st.rerun()
+    
+    st.sidebar.markdown("---")
     st.sidebar.header("🔧 Common Parameters")
     
     # Sliders in vertical layout (one column)
@@ -744,15 +755,6 @@ def main():
         st.session_state.show_comparison = True
         st.session_state.show_about = False
         st.session_state.show_manual = False
-        st.session_state.current_problem = None
-        st.session_state.solve_error = None
-        st.rerun()
-    
-    # About This App button
-    if st.sidebar.button("ℹ️ About This App", type="secondary", width='stretch'):
-        st.session_state.show_about = True
-        st.session_state.show_manual = False
-        st.session_state.show_comparison = False
         st.session_state.current_problem = None
         st.session_state.solve_error = None
         st.rerun()
@@ -1000,7 +1002,7 @@ def main():
                 st.success(f"✅ IP Solution found! Solve time: {problem_data['solve_time']:.3f} seconds")
                 
                 col1, col2 = st.columns([1, 2])
-                with col1:
+            with col1:
                     st.markdown("#### IP Solution Details:")
                     st.markdown(f"**Facilities**: {sorted(problem_data['solution'])}")
                     st.markdown(f"**Objective Value**: {problem_data['objective']:.2f}")
@@ -1148,8 +1150,8 @@ def main():
                         st.markdown(f"**Max Distance**: {problem_data['metrics']['max_distance']:.2f}")
                     if 'total_cost' in problem_data.get('metrics', {}):
                         st.markdown(f"**Total Cost**: {problem_data['metrics']['total_cost']:.1f}")
-                
-                with col2:
+            
+            with col2:
                     ip_fig = create_individual_problem_visualization(
                         demand_points, demand_weights, facility_points, facility_costs,
                         problem_data['solution'], f"{problem_name} IP: {info['name']}", 
