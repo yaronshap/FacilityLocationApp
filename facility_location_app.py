@@ -108,25 +108,25 @@ def generate_spatial_data(n_demand, n_facilities, seed, x_min=0, x_max=10, y_min
 
 def create_base_data_visualization(demand_points, demand_weights, facility_points, facility_costs, coverage_radius):
     """Create visualization for base data only"""
-    fig, ax = plt.subplots(1, 1, figsize=(3, 2.5))  # Half size: was (6, 5)
+    fig, ax = plt.subplots(1, 1, figsize=(8, 6))  # Larger figure for better Excel export
     
-    # Plot demand points
-    ax.scatter(demand_points[:, 0], demand_points[:, 1], c='lightblue', s=demand_weights*2, 
+    # Plot demand points (smaller markers relative to figure size)
+    ax.scatter(demand_points[:, 0], demand_points[:, 1], c='lightblue', s=demand_weights*1.5, 
                alpha=0.7, edgecolors='black', linewidth=0.5, label='Demand Points (size=weight)')
     
-    # Plot potential facilities
-    ax.scatter(facility_points[:, 0], facility_points[:, 1], c='gray', s=facility_costs/2, 
+    # Plot potential facilities (smaller markers relative to figure size)
+    ax.scatter(facility_points[:, 0], facility_points[:, 1], c='gray', s=facility_costs/3, 
                alpha=0.8, marker='s', edgecolors='black', linewidth=0.5, label='Potential Facilities (size=cost)')
     
-    # Add facility numbers
+    # Add facility numbers (smaller font)
     for i, (x, y) in enumerate(facility_points):
-        ax.annotate(f'F{i}', (x, y), xytext=(5, 5), textcoords='offset points', 
-                   fontsize=8, fontweight='bold', color='black')
+        ax.annotate(f'F{i}', (x, y), xytext=(3, 3), textcoords='offset points', 
+                   fontsize=9, fontweight='bold', color='black')
     
-    # Add demand point numbers
+    # Add demand point numbers (smaller font)
     for i, (x, y) in enumerate(demand_points):
-        ax.annotate(f'D{i}', (x, y), xytext=(5, 5), textcoords='offset points', 
-                   fontsize=8, fontweight='bold', color='darkblue')
+        ax.annotate(f'D{i}', (x, y), xytext=(3, 3), textcoords='offset points', 
+                   fontsize=9, fontweight='bold', color='darkblue')
     
     # Add coverage radius circles around all potential facilities
     if coverage_radius:
@@ -140,10 +140,11 @@ def create_base_data_visualization(demand_points, demand_weights, facility_point
     n_facilities = len(facility_points)
     title = f'D:{n_demand} | F:{n_facilities} | R:{coverage_radius}'
     
-    ax.set_title(title, fontweight='bold', fontsize=12)
-    ax.set_xlabel('X Coordinate')
-    ax.set_ylabel('Y Coordinate')
-    ax.legend(fontsize=9)
+    ax.set_title(title, fontweight='bold', fontsize=14, pad=10)
+    ax.set_xlabel('X Coordinate', fontsize=12)
+    ax.set_ylabel('Y Coordinate', fontsize=12)
+    ax.tick_params(axis='both', labelsize=10)
+    ax.legend(fontsize=10, loc='upper left', framealpha=0.9)
     ax.grid(True, alpha=0.3)
     ax.set_xlim(0, 10)
     ax.set_ylim(0, 10)
@@ -1683,9 +1684,9 @@ def main():
             # Insert image into worksheet
             from openpyxl.drawing.image import Image
             img = Image(img_buffer)
-            # Scale image to fit better in Excel (reduce size a bit)
-            img.width = img.width * 0.8
-            img.height = img.height * 0.8
+            # Scale image to fit better in Excel (now that figure is larger, scale it down more)
+            img.width = img.width * 0.6
+            img.height = img.height * 0.6
             worksheet.add_image(img, 'A1')
         
         excel_data = output.getvalue()
