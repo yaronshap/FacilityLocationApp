@@ -656,7 +656,7 @@ def main():
     )
     
     # Manual Solution button
-    if st.sidebar.button("📊 Visualize data and explore solutions", type="secondary", use_container_width=True):
+    if st.sidebar.button("📊 Visualize data and explore solutions", type="secondary", width='stretch'):
         st.session_state.show_manual = True
         st.session_state.show_about = False
         st.session_state.current_problem = None
@@ -703,35 +703,35 @@ def main():
     st.sidebar.header("🎯 Solve Problems")
     
     # Individual solve buttons for each problem (vertical layout)
-    if st.sidebar.button("🔴 LSCP", type="secondary", use_container_width=True):
+    if st.sidebar.button("🔴 LSCP", type="secondary", width='stretch'):
         st.session_state.show_about = False
         st.session_state.show_manual = False
         st.session_state.current_problem = 'LSCP'
         st.session_state.solve_error = None
         st.rerun()
 
-    if st.sidebar.button("🔵 MCLP", type="secondary", use_container_width=True):
+    if st.sidebar.button("🔵 MCLP", type="secondary", width='stretch'):
         st.session_state.show_about = False
         st.session_state.show_manual = False
         st.session_state.current_problem = 'MCLP'
         st.session_state.solve_error = None
         st.rerun()
 
-    if st.sidebar.button("🟢 P-Median", type="secondary", use_container_width=True):
+    if st.sidebar.button("🟢 P-Median", type="secondary", width='stretch'):
         st.session_state.show_about = False
         st.session_state.show_manual = False
         st.session_state.current_problem = 'P-Median'
         st.session_state.solve_error = None
         st.rerun()
 
-    if st.sidebar.button("🟠 P-Center", type="secondary", use_container_width=True):
+    if st.sidebar.button("🟠 P-Center", type="secondary", width='stretch'):
         st.session_state.show_about = False
         st.session_state.show_manual = False
         st.session_state.current_problem = 'P-Center'
         st.session_state.solve_error = None
         st.rerun()
 
-    if st.sidebar.button("🟣 SPLP", type="secondary", use_container_width=True):
+    if st.sidebar.button("🟣 SPLP", type="secondary", width='stretch'):
         st.session_state.show_about = False
         st.session_state.show_manual = False
         st.session_state.current_problem = 'SPLP'
@@ -739,7 +739,7 @@ def main():
         st.rerun()
     
     # Compute All button
-    if st.sidebar.button("🚀 Compute All", type="primary", use_container_width=True):
+    if st.sidebar.button("🚀 Compute All", type="primary", width='stretch'):
         st.session_state.show_comparison = True
         st.session_state.show_about = False
         st.session_state.show_manual = False
@@ -748,7 +748,7 @@ def main():
         st.rerun()
     
     # About This App button
-    if st.sidebar.button("ℹ️ About This App", type="secondary", use_container_width=True):
+    if st.sidebar.button("ℹ️ About This App", type="secondary", width='stretch'):
         st.session_state.show_about = True
         st.session_state.show_manual = False
         st.session_state.show_comparison = False
@@ -1597,7 +1597,7 @@ def main():
             index=[f"D{i}" for i in range(len(demand_points))],
             columns=[f"F{i}" for i in range(len(facility_points))]
         )
-        st.dataframe(distance_df.round(2), use_container_width=True)
+        st.dataframe(distance_df.round(2), width='stretch')
         
         # Create demand points details table
         st.markdown("#### Demand Points Details")
@@ -1607,7 +1607,7 @@ def main():
             'Y Coordinate': demand_points[:, 1].round(2),
             'Weight': demand_weights.astype(int)
         })
-        st.dataframe(demand_df, use_container_width=True)
+        st.dataframe(demand_df, width='stretch')
         
         # Create facility points details table
         st.markdown("#### Facility Points Details")
@@ -1617,7 +1617,7 @@ def main():
             'Y Coordinate': facility_points[:, 1].round(2),
             'Opening Cost': facility_costs.astype(int)
         })
-        st.dataframe(facility_df, use_container_width=True)
+        st.dataframe(facility_df, width='stretch')
     
     elif st.session_state.show_about:
         # About this app content
@@ -1771,9 +1771,9 @@ def main():
             else:
                 solutions_match = "❌ Different Feasibility"
             
-            # Get objective values
-            ip_obj = ip_result['objective'] if ip_result['feasible'] else "Infeasible"
-            enum_obj = enum_result['objective'] if enum_result['feasible'] else "Infeasible"
+            # Get objective values (convert to string to avoid mixed types in DataFrame)
+            ip_obj = f"{ip_result['objective']:.2f}" if ip_result['feasible'] else "Infeasible"
+            enum_obj = f"{enum_result['objective']:.2f}" if enum_result['feasible'] else "Infeasible"
             
             # Get solve times
             ip_time = ip_result['solve_time']
@@ -1783,11 +1783,11 @@ def main():
             ip_facilities = len(ip_result['solution']) if ip_result['feasible'] and ip_result['solution'] else "N/A"
             enum_facilities = len(enum_result['solution']) if enum_result['feasible'] and enum_result['solution'] else "N/A"
             
-            # Determine if objectives match
+            # Determine if objectives match (use original objective values, not formatted strings)
             objectives_match = "N/A"
             if ip_result['feasible'] and enum_result['feasible']:
-                if isinstance(ip_obj, (int, float)) and isinstance(enum_obj, (int, float)):
-                    objectives_match = "✅ Yes" if abs(ip_obj - enum_obj) < 1e-6 else "❌ No"
+                if ip_result['objective'] is not None and enum_result['objective'] is not None:
+                    objectives_match = "✅ Yes" if abs(ip_result['objective'] - enum_result['objective']) < 1e-6 else "❌ No"
             
             # Get solution lists
             ip_solution_str = str(sorted(ip_result['solution'])) if ip_result['feasible'] and ip_result['solution'] else "N/A"
@@ -1812,7 +1812,7 @@ def main():
         
         # Display comparison table
         comparison_df = pd.DataFrame(comparison_data)
-        st.dataframe(comparison_df, use_container_width=True, hide_index=True)
+        st.dataframe(comparison_df, width='stretch', hide_index=True)
         
         # Problem-specific details
         st.markdown("### 🔍 Problem-Specific Details")
