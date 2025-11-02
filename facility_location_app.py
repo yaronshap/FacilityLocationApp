@@ -704,39 +704,39 @@ def main():
     
     # Individual solve buttons for each problem (vertical layout)
     if st.sidebar.button("🔴 LSCP", type="secondary", width='stretch'):
-                st.session_state.show_about = False
-                st.session_state.show_manual = False
-                st.session_state.current_problem = 'LSCP'
+        st.session_state.show_about = False
+        st.session_state.show_manual = False
+        st.session_state.current_problem = 'LSCP'
         st.session_state.solve_error = None
-            st.rerun()
+        st.rerun()
     
     if st.sidebar.button("🔵 MCLP", type="secondary", width='stretch'):
-                st.session_state.show_about = False
-                st.session_state.show_manual = False
-                st.session_state.current_problem = 'MCLP'
+        st.session_state.show_about = False
+        st.session_state.show_manual = False
+        st.session_state.current_problem = 'MCLP'
         st.session_state.solve_error = None
-            st.rerun()
+        st.rerun()
     
     if st.sidebar.button("🟢 P-Median", type="secondary", width='stretch'):
-                st.session_state.show_about = False
-                st.session_state.show_manual = False
-                st.session_state.current_problem = 'P-Median'
+        st.session_state.show_about = False
+        st.session_state.show_manual = False
+        st.session_state.current_problem = 'P-Median'
         st.session_state.solve_error = None
-            st.rerun()
+        st.rerun()
     
     if st.sidebar.button("🟠 P-Center", type="secondary", width='stretch'):
-                st.session_state.show_about = False
-                st.session_state.show_manual = False
-                st.session_state.current_problem = 'P-Center'
+        st.session_state.show_about = False
+        st.session_state.show_manual = False
+        st.session_state.current_problem = 'P-Center'
         st.session_state.solve_error = None
-            st.rerun()
+        st.rerun()
     
     if st.sidebar.button("🟣 SPLP", type="secondary", width='stretch'):
-                st.session_state.show_about = False
-                st.session_state.show_manual = False
-                st.session_state.current_problem = 'SPLP'
+        st.session_state.show_about = False
+        st.session_state.show_manual = False
+        st.session_state.current_problem = 'SPLP'
         st.session_state.solve_error = None
-            st.rerun()
+        st.rerun()
     
     # Compute All button
     if st.sidebar.button("🚀 Compute All", type="primary", width='stretch'):
@@ -1140,13 +1140,13 @@ def main():
                         st.markdown(f"• **Total**: {problem_data['objective']:.1f} = {facility_cost_total:.1f} + {transport_cost_total:.1f}")
                     
                     if 'coverage' in problem_data.get('metrics', {}):
-                    st.markdown(f"**Coverage**: {problem_data['metrics']['coverage']:.1f}%")
+                        st.markdown(f"**Coverage**: {problem_data['metrics']['coverage']:.1f}%")
                     if 'total_distance' in problem_data.get('metrics', {}):
-                    st.markdown(f"**Total Distance**: {problem_data['metrics']['total_distance']:.1f}")
+                        st.markdown(f"**Total Distance**: {problem_data['metrics']['total_distance']:.1f}")
                     if 'max_distance' in problem_data.get('metrics', {}):
-                    st.markdown(f"**Max Distance**: {problem_data['metrics']['max_distance']:.2f}")
+                        st.markdown(f"**Max Distance**: {problem_data['metrics']['max_distance']:.2f}")
                     if 'total_cost' in problem_data.get('metrics', {}):
-                    st.markdown(f"**Total Cost**: {problem_data['metrics']['total_cost']:.1f}")
+                        st.markdown(f"**Total Cost**: {problem_data['metrics']['total_cost']:.1f}")
             
             with col2:
                     ip_fig = create_individual_problem_visualization(
@@ -1452,7 +1452,7 @@ def main():
             # Check if solutions match
             if abs(problem_data['objective'] - enum_data['objective']) < 1e-6:
                 st.success("✅ **Perfect Match!** Both methods found identical solutions.")
-                else:
+            else:
                 st.warning(f"⚠️ **Different Results** IP: {problem_data['objective']:.2f}, Enum: {enum_data['objective']:.2f}")
     
     elif st.session_state.current_problem and st.session_state.solve_error:
