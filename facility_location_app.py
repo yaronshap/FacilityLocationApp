@@ -1150,8 +1150,8 @@ def main():
                         st.markdown(f"**Max Distance**: {problem_data['metrics']['max_distance']:.2f}")
                     if 'total_cost' in problem_data.get('metrics', {}):
                         st.markdown(f"**Total Cost**: {problem_data['metrics']['total_cost']:.1f}")
-            
-            with col2:
+                
+                with col2:
                     ip_fig = create_individual_problem_visualization(
                         demand_points, demand_weights, facility_points, facility_costs,
                         problem_data['solution'], f"{problem_name} IP: {info['name']}", 
