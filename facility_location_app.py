@@ -1618,6 +1618,69 @@ def main():
             'Opening Cost': facility_costs.astype(int)
         })
         st.dataframe(facility_df, use_container_width=True)
+        
+        # Download button for Excel export
+        st.markdown("---")
+        st.markdown("### 📥 Download Data")
+        
+        # Create Excel file in memory
+        from io import BytesIO
+        output = BytesIO()
+        
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            # Sheet 1: Problem Parameters
+            params_df = pd.DataFrame({
+                'Parameter': [
+                    'Number of Demand Points',
+                    'Number of Facilities',
+                    'Coverage Radius',
+                    'Number of Facilities (p)',
+                    'Random Seed'
+                ],
+                'Value': [
+                    len(demand_points),
+                    len(facility_points),
+                    coverage_radius,
+                    num_facilities,
+                    seed
+                ]
+            })
+            params_df.to_excel(writer, sheet_name='Parameters', index=False)
+            
+            # Sheet 2: Distance Matrix
+            distance_df.round(2).to_excel(writer, sheet_name='Distance Matrix')
+            
+            # Sheet 3: Demand Points
+            demand_df.to_excel(writer, sheet_name='Demand Points', index=False)
+            
+            # Sheet 4: Facility Points
+            facility_df.to_excel(writer, sheet_name='Facility Points', index=False)
+            
+            # Sheet 5: Coordinates
+            coordinates_df = pd.DataFrame({
+                'Type': ['Demand'] * len(demand_points) + ['Facility'] * len(facility_points),
+                'ID': [f"D{i}" for i in range(len(demand_points))] + [f"F{i}" for i in range(len(facility_points))],
+                'X': list(demand_points[:, 0].round(2)) + list(facility_points[:, 0].round(2)),
+                'Y': list(demand_points[:, 1].round(2)) + list(facility_points[:, 1].round(2))
+            })
+            coordinates_df.to_excel(writer, sheet_name='All Coordinates', index=False)
+        
+        excel_data = output.getvalue()
+        
+        st.download_button(
+            label="📥 Download Excel File",
+            data=excel_data,
+            file_name=f"facility_location_data_seed{seed}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True
+        )
+        
+        st.info("💡 **Excel file contains 5 sheets:**\n"
+                "1. **Parameters** - Problem configuration\n"
+                "2. **Distance Matrix** - Distances between all demand-facility pairs\n"
+                "3. **Demand Points** - Demand locations, coordinates, and weights\n"
+                "4. **Facility Points** - Facility locations, coordinates, and costs\n"
+                "5. **All Coordinates** - Combined coordinate data for easy plotting")
     
     elif st.session_state.show_about:
         # About this app content
