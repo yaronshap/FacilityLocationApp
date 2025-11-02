@@ -1597,7 +1597,7 @@ def main():
             index=[f"D{i}" for i in range(len(demand_points))],
             columns=[f"F{i}" for i in range(len(facility_points))]
         )
-        st.dataframe(distance_df.round(2), width='stretch')
+        st.dataframe(distance_df.round(2), use_container_width=True)
         
         # Create demand points details table
         st.markdown("#### Demand Points Details")
@@ -1607,7 +1607,7 @@ def main():
             'Y Coordinate': demand_points[:, 1].round(2),
             'Weight': demand_weights.astype(int)
         })
-        st.dataframe(demand_df, width='stretch')
+        st.dataframe(demand_df, use_container_width=True)
         
         # Create facility points details table
         st.markdown("#### Facility Points Details")
@@ -1617,7 +1617,7 @@ def main():
             'Y Coordinate': facility_points[:, 1].round(2),
             'Opening Cost': facility_costs.astype(int)
         })
-        st.dataframe(facility_df, width='stretch')
+        st.dataframe(facility_df, use_container_width=True)
     
     elif st.session_state.show_about:
         # About this app content
