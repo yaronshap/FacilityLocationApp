@@ -1471,21 +1471,7 @@ def main():
         st.subheader("✋ Manual Solution Creation")
         
         # Instructions
-        st.markdown("**Instructions:** Click on facilities in the plot below to select/deselect them. Use the buttons to clear selection or go back.")
-        
-        # Control buttons
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if st.button("🗑️ Clear Selection", type="secondary"):
-                st.session_state.manual_solution = set()
-                st.rerun()
-        with col2:
-            if st.button("← Back to Main", type="secondary"):
-                st.session_state.show_manual = False
-                st.rerun()
-        with col3:
-            if st.button("🔄 Refresh Plot", type="secondary"):
-                st.rerun()
+        st.markdown("**Instructions:** Select facilities using the checkboxes to see objective values for different problems.")
         
         # Create two-column layout: facility selection on left, plot on right
         col_left, col_right = st.columns([1, 2])
