@@ -1812,7 +1812,7 @@ def main():
         
         # Display comparison table
         comparison_df = pd.DataFrame(comparison_data)
-        st.dataframe(comparison_df, width='stretch', hide_index=True)
+        st.dataframe(comparison_df, use_container_width=True, hide_index=True)
         
         # Problem-specific details
         st.markdown("### 🔍 Problem-Specific Details")
