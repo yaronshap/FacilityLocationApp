@@ -690,13 +690,13 @@ def main():
     # Sliders in vertical layout (one column)
     n_demand = st.sidebar.slider(
             "Number of Demand Points", 
-            min_value=2, max_value=50, value=10, step=1,
+            min_value=2, max_value=25, value=10, step=1,
             help="Number of customer/demand locations"
         )
         
     n_facilities = st.sidebar.slider(
             "Number of Potential Facilities", 
-            min_value=2, max_value=50, value=5, step=1,
+            min_value=2, max_value=15, value=5, step=1,
             help="Number of potential facility locations"
         )
     
