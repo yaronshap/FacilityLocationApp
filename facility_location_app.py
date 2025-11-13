@@ -1646,7 +1646,7 @@ def main():
             index=[f"D{i}" for i in range(len(demand_points))],
             columns=[f"F{i}" for i in range(len(facility_points))]
         )
-        st.dataframe(distance_df.round(2), use_container_width=True)
+        st.dataframe(distance_df.round(2), width='stretch')
         
         # Create demand points details table
         st.markdown("#### Demand Points Details")
@@ -1656,7 +1656,7 @@ def main():
             'Y Coordinate': demand_points[:, 1].round(2),
             'Weight': demand_weights.astype(int)
         })
-        st.dataframe(demand_df, use_container_width=True)
+        st.dataframe(demand_df, width='stretch')
         
         # Create facility points details table
         st.markdown("#### Facility Points Details")
@@ -1666,7 +1666,7 @@ def main():
             'Y Coordinate': facility_points[:, 1].round(2),
             'Opening Cost': facility_costs.astype(int)
         })
-        st.dataframe(facility_df, use_container_width=True)
+        st.dataframe(facility_df, width='stretch')
         
         # Download button for Excel export
         st.markdown("---")
@@ -1956,7 +1956,74 @@ def main():
         
         # Display comparison table
         comparison_df = pd.DataFrame(comparison_data)
-        st.dataframe(comparison_df, use_container_width=True, hide_index=True)
+        st.dataframe(comparison_df, width='stretch', hide_index=True)
+        
+        # Cross-evaluation matrix
+        st.markdown("### 🔄 Cross-Evaluation Matrix")
+        st.markdown("**How does each solution method perform when evaluated against each problem's objective?**")
+        
+        # Create cross-evaluation data using IP solutions
+        cross_eval_data = []
+        
+        # For each solution method (rows)
+        for sol_problem in results['problem_names']:
+            row_data = {'Solution Method': sol_problem}
+            sol_result = results['ip_results'][sol_problem]
+            
+            if sol_result['feasible'] and sol_result['solution']:
+                solution = sol_result['solution']
+                
+                # Evaluate this solution on each objective (columns)
+                for obj_problem in results['problem_names']:
+                    try:
+                        if obj_problem == 'LSCP':
+                            # LSCP: minimize number of facilities (while covering all)
+                            num_facilities = len(solution)
+                            coverage_pct = calculate_coverage(solution, distances, coverage_radius)
+                            # Show as "N facilities (coverage%)"
+                            row_data[f'{obj_problem} Objective'] = f"{num_facilities} ({coverage_pct:.0f}%)"
+                        
+                        elif obj_problem == 'MCLP':
+                            # MCLP: maximize weighted coverage
+                            weighted_cov = calculate_weighted_coverage(solution, distances, coverage_radius, demand_weights)
+                            row_data[f'{obj_problem} Objective'] = f"{weighted_cov:.1f}"
+                        
+                        elif obj_problem == 'P-Median':
+                            # P-Median: minimize weighted total distance
+                            total_dist = calculate_total_distance(solution, distances, demand_weights)
+                            row_data[f'{obj_problem} Objective'] = f"{total_dist:.1f}"
+                        
+                        elif obj_problem == 'P-Center':
+                            # P-Center: minimize maximum distance
+                            max_dist = calculate_max_distance(solution, distances)
+                            row_data[f'{obj_problem} Objective'] = f"{max_dist:.2f}"
+                        
+                        elif obj_problem == 'SPLP':
+                            # SPLP: minimize total cost (opening + transportation)
+                            total_cost = calculate_total_cost(solution, facility_costs, distances, demand_weights)
+                            row_data[f'{obj_problem} Objective'] = f"{total_cost:.1f}"
+                    
+                    except Exception as e:
+                        row_data[f'{obj_problem} Objective'] = "Error"
+            else:
+                # If solution is infeasible, mark all objectives as N/A
+                for obj_problem in results['problem_names']:
+                    row_data[f'{obj_problem} Objective'] = "N/A"
+            
+            cross_eval_data.append(row_data)
+        
+        # Display cross-evaluation table
+        cross_eval_df = pd.DataFrame(cross_eval_data)
+        st.dataframe(cross_eval_df, width='stretch', hide_index=True)
+        
+        st.markdown("""
+        **Notes:**
+        - LSCP: Shows number of facilities and coverage percentage
+        - MCLP: Weighted coverage (higher is better)
+        - P-Median: Weighted total distance (lower is better)
+        - P-Center: Maximum distance (lower is better)
+        - SPLP: Total cost including opening and transportation (lower is better)
+        """)
         
         # Problem-specific details
         st.markdown("### 🔍 Problem-Specific Details")
