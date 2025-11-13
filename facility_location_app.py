@@ -79,15 +79,67 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-def generate_spatial_data(n_demand, n_facilities, seed, x_min=0, x_max=10, y_min=0, y_max=8):
-    """Generate spatial data for facility location problems"""
+def generate_spatial_data(n_demand, n_facilities, seed, distribution_type='Uniform', x_min=0, x_max=10, y_min=0, y_max=8):
+    """Generate spatial data for facility location problems
+    
+    Parameters:
+    -----------
+    n_demand : int
+        Number of demand points
+    n_facilities : int
+        Number of potential facility locations
+    seed : int
+        Random seed for reproducibility
+    distribution_type : str
+        'Uniform' for uniform distribution or 'Gaussian' for clustered distribution
+    x_min, x_max, y_min, y_max : float
+        Boundaries of the study area
+    """
     np.random.seed(seed)
     
     # Generate demand points (customers)
-    demand_points = np.random.uniform([x_min+1, y_min+1], [x_max-1, y_max-1], (n_demand, 2))
+    if distribution_type == 'Gaussian':
+        # Define three centroids with their proportions
+        centroids = np.array([[3.0, 7.0], [3.0, 3.0], [7.0, 7.0]])
+        proportions = [0.4, 0.4, 0.2]  # 40%, 40%, 20%
+        
+        # Calculate number of points for each cluster
+        n_per_cluster = [int(n_demand * p) for p in proportions]
+        # Adjust the last cluster to ensure exact count
+        n_per_cluster[-1] = n_demand - sum(n_per_cluster[:-1])
+        
+        demand_points = []
+        for centroid, n_points in zip(centroids, n_per_cluster):
+            # Generate points with Gaussian distribution using acceptance-rejection
+            # Standard deviation of 0.8 for reasonable spread
+            cluster_points = []
+            while len(cluster_points) < n_points:
+                # Generate candidate points (generate extra to reduce iterations)
+                n_needed = n_points - len(cluster_points)
+                n_candidates = max(n_needed * 2, 10)  # Generate 2x more to be efficient
+                candidates = np.random.randn(n_candidates, 2) * 0.8 + centroid
+                
+                # Accept only those within bounds using acceptance-rejection
+                valid_mask = (candidates[:, 0] >= x_min) & (candidates[:, 0] <= x_max) & \
+                             (candidates[:, 1] >= y_min) & (candidates[:, 1] <= y_max)
+                valid_points = candidates[valid_mask]
+                
+                # Add valid points (but not more than needed)
+                for point in valid_points:
+                    if len(cluster_points) < n_points:
+                        cluster_points.append(point)
+                    else:
+                        break
+            
+            demand_points.append(np.array(cluster_points))
+        
+        demand_points = np.vstack(demand_points)
+    else:  # Uniform distribution
+        demand_points = np.random.uniform([x_min+1, y_min+1], [x_max-1, y_max-1], (n_demand, 2))
+    
     demand_weights = np.random.randint(10, 100, n_demand)  # Population/demand at each point
     
-    # Generate potential facility locations
+    # Generate potential facility locations (always uniform)
     facility_points = np.random.uniform([x_min+0.5, y_min+0.5], [x_max-0.5, y_max-0.5], (n_facilities, 2))
     facility_costs = np.random.randint(50, 200, n_facilities)  # Cost to open each facility
     
@@ -667,6 +719,14 @@ def main():
         help="Seed for random number generation"
     )
     
+    # Distribution type selector
+    distribution_type = st.sidebar.selectbox(
+        "Data Distribution",
+        options=['Uniform', 'Gaussian'],
+        index=0,
+        help="Uniform: Random distribution across the area\nGaussian: Clustered around 3 centroids at (3,7), (3,3), and (7,7)"
+    )
+    
     # Manual Solution button
     if st.sidebar.button("📊 Visualize data and explore solutions", type="secondary", width='stretch'):
         st.session_state.show_manual = True
@@ -676,12 +736,12 @@ def main():
         st.rerun()
     
     # Generate spatial data - always regenerate when parameters change
-    current_params = (n_demand, n_facilities, seed, coverage_radius, num_facilities)
+    current_params = (n_demand, n_facilities, seed, coverage_radius, num_facilities, distribution_type)
     if (st.session_state.spatial_data is None or 
         st.session_state.spatial_data.get('params') != current_params):
         with st.spinner("Generating spatial data..."):
             demand_points, demand_weights, facility_points, facility_costs, distances = generate_spatial_data(
-                n_demand, n_facilities, seed
+                n_demand, n_facilities, seed, distribution_type
             )
             st.session_state.spatial_data = {
                 'demand_points': demand_points,
